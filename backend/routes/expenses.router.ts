@@ -1,0 +1,42 @@
+
+import express from "express";
+import type { Expense, NewExpense } from "../types/expense.ts";
+import { ExpensesService } from "../services/expenses.service.ts";
+import { isValidNewExpense } from "../guards/expenses.guard.ts";
+
+const expensesRouter = express.Router();
+
+expensesRouter.get("/", async (req, res) => {
+  try {
+    const expenses = await ExpensesService.getExpenses();
+    res.json(expenses);
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+expensesRouter.post("/", async (req, res) => {
+  try {
+    // console.log("AAA");
+    const expense: NewExpense = req.body;
+    // console.log("router: "+JSON.stringify(expense))
+    if (!isValidNewExpense(expense)) {
+      return res.status(400).json({ error: "aaaaaaaaaaaaaa" });
+    }
+    const expenses = await ExpensesService.addExpense(expense);
+    res.status(201).json(expenses);
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+expensesRouter.post("/reset", async (req, res) => {
+  try {
+    const expenses = await ExpensesService.resetExpenses();
+    res.json(expenses);
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+export default expensesRouter;
