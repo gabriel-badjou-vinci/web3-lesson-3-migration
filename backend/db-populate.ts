@@ -1,50 +1,37 @@
+import { Temporal } from 'temporal-polyfill';
+(globalThis as any).Temporal = Temporal;
 import { db } from './src/prisma/db.ts';
 
 async function main() {
+
+  // const users = await db.orm.public.User.createAll([
+  //   {
+  //     "name":"Bob",
+  //     "email":"b@mail.com",
+  //     "bankAccount":"1234567890",
+  //   },
+  //   {
+  //     "name":"Alice",
+  //     "email":"a@mail.com",
+  //     "bankAccount":"0987654321",
+  //   }
+  // ])
+
   const expenses = await db.orm.public.Expense.createAll([
-  {
-    "date": "2025-01-16",
-    "description": "Example expense #1 from Alice",
-    "payer": "Alice",
-    "amount": 25.5
-  },
-  {
-    "date": "2025-01-15",
-    "description": "Example expense #2 from Bob",
-    "payer": "Bob",
-    "amount": 35
-  },
-  {
-    "date": "2025-01-15",
-    "description": "Example expense #3 from Alice",
-    "payer": "Alice",
-    "amount": 2
-  },
-  {
-    "date": "2026-09-18",
-    "description": "New random Expense",
-    "payer": "New random Payer",
-    "amount": 69.56660033593514
-  },
-  {
-    "date": "2026-09-18",
-    "description": "New random Expense",
-    "payer": "New random Payer",
-    "amount": 12.66630576002703
-  },
-  {
-    "date": "2026-09-18",
-    "description": "New random Expense",
-    "payer": "New random Payer",
-    "amount": 21.267052537904252
-  },
-  {
-    "date": "2026-09-18",
-    "description": "New random Expense",
-    "payer": "New random Payer",
-    "amount": 29.445904735715157
-  }
-]);
+    {
+      "description": "ex 1",
+      "amount": 25.5,
+      "date": Temporal.PlainDate.from({ year: 2021, month: 7, day: 1 }).toZonedDateTime("UTC").toInstant(),
+      "payerId":1,    
+    },
+    {
+      "description": "ex 2",
+      "amount": 56.5,
+      "date": Temporal.PlainDate.from({ year: 2021, month: 7, day: 1 }).toZonedDateTime("UTC").toInstant(),
+      "payerId":2,    
+    }
+  ]);
+
   console.log(expenses);
 }
 

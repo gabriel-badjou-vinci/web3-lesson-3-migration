@@ -1,7 +1,8 @@
 import fs from "fs";
 import type { Expense, NewExpense } from "../types/expense.ts";
 import { db } from '../src/prisma/db.ts';
-
+import { Temporal } from "temporal-polyfill";
+(globalThis as any).Temporal = Temporal;
 export class ExpensesService {
 
   // private static dataPath = "./data/expenses.json";
@@ -12,7 +13,20 @@ export class ExpensesService {
   }
   
   public static async addExpense(newExpense: NewExpense): Promise<Expense[]> {
-    await db.orm.public.Expense.create(newExpense);
+    console.log("aaaaaaaaaaaaaaaaaa");
+    try {
+    await db.orm.public.Expense.create({
+      amount: newExpense.amount,
+      description: newExpense.description,
+      date: Temporal.PlainDate.from(newExpense.date).toZonedDateTime("UTC").toInstant(),
+      payerId: newExpense.payer === "Bob" ? 1 : 2,
+    });
+    // console.log(newExpense.payer , newExpense.payer === "Bob");
+  } catch (e) {
+    console.error("create a échoué :", e);
+    throw e;
+  }
+    console.log("bbbbbbbbbbbbbbbbbb");
     return await this.readExpenses() ;
   }
   
@@ -26,7 +40,8 @@ export class ExpensesService {
       const data = await db.orm.public.Expense.all();
       return data.map((item) => ({
         ...item,
-        id:String(item.id),
+        id: String(item.id),
+        payer: (item.payerId === 1 ? "Bob" : "Alice")
       })) as Expense[];
     } catch (error) {
       console.error("Error reading expenses file:", error);
